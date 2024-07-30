@@ -1,5 +1,13 @@
+import { Role } from 'src/roles/entities/role.entity';
 import { Task } from 'src/tasks/entities/task.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class User {
@@ -20,6 +28,10 @@ export class User {
 
   @Column({ unique: true })
   email: string;
+
+  @ManyToMany(() => Role, (role) => role.users)
+  @JoinTable()
+  roles: Role[];
 
   @OneToMany(() => Task, (task) => task.assignedTo)
   tasks: Task[];
