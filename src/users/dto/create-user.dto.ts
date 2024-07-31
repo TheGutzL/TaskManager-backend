@@ -1,4 +1,11 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import {
+  ArrayMinSize,
+  ArrayNotEmpty,
+  IsArray,
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+} from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -19,4 +26,11 @@ export class CreateUserDto {
 
   @IsEmail()
   email: string;
+
+  @IsArray()
+  @ArrayNotEmpty()
+  @ArrayMinSize(1)
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
+  roles: string[];
 }

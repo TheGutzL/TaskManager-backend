@@ -9,6 +9,9 @@ export class Role {
   @Column()
   name: string;
 
+  @Column()
+  description: string;
+
   @ManyToMany(() => User, (user) => user.roles)
   users: User[];
 }

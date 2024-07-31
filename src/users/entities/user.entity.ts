@@ -30,7 +30,7 @@ export class User {
   email: string;
 
   @ManyToMany(() => Role, (role) => role.users)
-  @JoinTable()
+  @JoinTable({ name: 'user_roles' })
   roles: Role[];
 
   @OneToMany(() => Task, (task) => task.assignedTo)

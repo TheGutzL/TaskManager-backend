@@ -4,7 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Role } from 'src/roles/entities/role.entity';
+import { In, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -12,11 +13,12 @@ import { User } from './entities/user.entity';
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(Role) private readonly roleRepository: Repository<Role>,
   ) {}
 
   async findAll() {
-    return this.userRepository.find();
+    return this.userRepository.find({ relations: ['roles'] });
   }
 
   async findById(id: number) {
@@ -30,11 +32,14 @@ export class UsersService {
   }
 
   async findOneByUsername(username: string) {
-    return this.userRepository.findOne({ where: { username: username } });
+    return this.userRepository.findOne({
+      where: { username: username },
+      relations: ['roles'],
+    });
   }
 
   async create(createUserDto: CreateUserDto) {
-    const { username, email } = createUserDto;
+    const { username, email, roles } = createUserDto;
 
     const existingUserByUsername = await this.userRepository.findOne({
       where: { username },
@@ -48,12 +53,23 @@ export class UsersService {
     if (existingUserByEmail)
       throw new ConflictException('El email ya está en uso');
 
-    const userCreated = this.userRepository.create(createUserDto);
+    const rolesEntites = await this.roleRepository.findBy({ name: In(roles) });
+
+    const userCreated = this.userRepository.create({
+      ...createUserDto,
+      roles: rolesEntites,
+    });
     return await this.userRepository.save(userCreated);
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    return await this.userRepository.update(id, updateUserDto);
+    const { roles, ...userData } = updateUserDto;
+
+    const roleEtnties = await this.roleRepository.findBy({ name: In(roles) });
+
+    await this.userRepository.update(id, { ...userData, roles: roleEtnties });
+
+    return this.userRepository.findOne({ where: { id }, relations: ['roles'] });
   }
 
   async delete(id: number) {

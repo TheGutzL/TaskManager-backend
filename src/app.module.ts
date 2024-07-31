@@ -7,6 +7,7 @@ import { User } from './users/entities/user.entity';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
+import { Role } from './roles/entities/role.entity';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -17,7 +18,7 @@ import { RolesModule } from './roles/roles.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [User, Task],
+      entities: [User, Task, Role],
       synchronize: true,
     }),
     UsersModule,

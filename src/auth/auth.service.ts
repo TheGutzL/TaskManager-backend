@@ -16,20 +16,24 @@ export class AuthService {
   async validateUser(username: string, password: string): Promise<any> {
     const existingUserByUsername =
       await this.usersService.findOneByUsername(username);
+    
     if (!existingUserByUsername)
       throw new UnauthorizedException('Invalid credentials');
+
     const isPasswordValid = await bcrypt.compare(
       password,
       existingUserByUsername.password,
     );
+
     if (!isPasswordValid)
       throw new UnauthorizedException('Invalid credentials');
+
     const { password: userPassword, ...result } = existingUserByUsername;
     return result;
   }
 
   async login(user: any) {
-    const payload = { username: user.username, sub: user.id };
+    const payload = { username: user.username, sub: user.id, roles: user.roles };
     return { access_token: this.jwtService.sign(payload) };
   }
 
