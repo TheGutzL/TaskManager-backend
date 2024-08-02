@@ -11,31 +11,37 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Controller('api/v1/users')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get()
+  @Roles('User', 'Invited')
   async findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
+  @Roles('User', 'Invited')
   async findById(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findById(id);
   }
 
   @Post()
+  @Roles('Admin')
   async create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
   @Put(':id')
+  @Roles('User')
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
@@ -44,6 +50,7 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @Roles('User')
   async updatePartial(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
@@ -52,6 +59,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @Roles('Admin')
   async delete(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.delete(id);
   }

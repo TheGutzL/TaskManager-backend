@@ -2,11 +2,13 @@ import { Role } from 'src/roles/entities/role.entity';
 import { Task } from 'src/tasks/entities/task.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
@@ -35,4 +37,10 @@ export class User {
 
   @OneToMany(() => Task, (task) => task.assignedTo)
   tasks: Task[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

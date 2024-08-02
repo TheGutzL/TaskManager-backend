@@ -18,17 +18,16 @@ import { TasksService } from './tasks.service';
 
 @Controller('api/v1/tasks')
 @UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('User')
 export class TasksController {
   constructor(private tasksService: TasksService) {}
 
   @Get()
-  @Roles('Admin')
   async findAll() {
     return this.tasksService.findAll();
   }
 
   @Get(':id')
-  @Roles('User', 'Admin')
   async findOneById(@Param('id', ParseIntPipe) id: number) {
     return this.tasksService.findOneById(id);
   }

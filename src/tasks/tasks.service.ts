@@ -14,7 +14,7 @@ export class TasksService {
   ) {}
 
   findAll() {
-    return this.taskRepository.find();
+    return this.taskRepository.find({ relations: ['assignedTo'] });
   }
 
   async findOneById(id: number) {
