@@ -55,6 +55,9 @@ export class UsersService {
 
     const rolesEntites = await this.roleRepository.findBy({ name: In(roles) });
 
+    if (rolesEntites.length === 0)
+      throw new NotFoundException('Roles no encontrados');
+
     const userCreated = this.userRepository.create({
       ...createUserDto,
       roles: rolesEntites,

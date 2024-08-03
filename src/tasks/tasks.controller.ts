@@ -18,7 +18,7 @@ import { TasksService } from './tasks.service';
 
 @Controller('api/v1/tasks')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('User')
+@Roles('User', 'Admin')
 export class TasksController {
   constructor(private tasksService: TasksService) {}
 

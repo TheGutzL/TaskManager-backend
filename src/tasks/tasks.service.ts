@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { TasksGateway } from 'src/gateways/tasks/tasks.gateway';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -11,9 +12,10 @@ export class TasksService {
   constructor(
     @InjectRepository(Task) private taskRepository: Repository<Task>,
     @InjectRepository(User) private userRepository: Repository<User>,
+    private tasksGateway: TasksGateway,
   ) {}
 
-  findAll() {
+  findAll(): Promise<Task[]> {
     return this.taskRepository.find({ relations: ['assignedTo'] });
   }
 
@@ -32,7 +34,9 @@ export class TasksService {
       assignedTo: userFound,
     });
 
-    return await this.taskRepository.save(task);
+    const savedTask = await this.taskRepository.save(task);
+    this.tasksGateway.notifyAllClients('taskCreated', savedTask);
+    return savedTask;
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto) {
