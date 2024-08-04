@@ -16,7 +16,7 @@ export class AuthService {
   async validateUser(username: string, password: string): Promise<any> {
     const existingUserByUsername =
       await this.usersService.findOneByUsername(username);
-    
+
     if (!existingUserByUsername)
       throw new UnauthorizedException('Invalid credentials');
 
@@ -33,7 +33,11 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = { username: user.username, sub: user.id, roles: user.roles };
+    const payload = {
+      username: user.username,
+      sub: user.id,
+      roles: user.roles,
+    };
     return { access_token: this.jwtService.sign(payload) };
   }
 
@@ -43,5 +47,24 @@ export class AuthService {
     const userCreated = await this.usersService.create(user);
 
     return this.login(userCreated);
+  }
+
+  async validateOAuthUser(profile: any): Promise<any> {
+    const existingUser = await this.usersService.findOneByGithubId(profile.id);
+
+    if (!existingUser) {
+      const newUser = {
+        username: profile.username || profile.id,
+        githubId: profile.id,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        email: profile.email,
+        roles: ['User'],
+      };
+      const userCreated = await this.usersService.create(newUser);
+      return userCreated;
+    }
+
+    return existingUser;
   }
 }

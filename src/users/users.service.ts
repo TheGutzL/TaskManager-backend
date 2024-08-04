@@ -9,6 +9,7 @@ import { In, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { OAuthUserDto } from './dto/create-oauth-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -38,7 +39,11 @@ export class UsersService {
     });
   }
 
-  async create(createUserDto: CreateUserDto) {
+  async findOneByGithubId(githubId: string): Promise<User | undefined> {
+    return await this.userRepository.findOne({ where: { githubId: githubId } });
+  }
+
+  async create(createUserDto: CreateUserDto | OAuthUserDto) {
     const { username, email, roles } = createUserDto;
 
     const existingUserByUsername = await this.userRepository.findOne({

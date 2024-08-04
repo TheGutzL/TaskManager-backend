@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TasksGateway } from 'src/gateways/tasks/tasks.gateway';
+import { NotificationsService } from 'src/notifications/notifications.service';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -12,7 +12,7 @@ export class TasksService {
   constructor(
     @InjectRepository(Task) private taskRepository: Repository<Task>,
     @InjectRepository(User) private userRepository: Repository<User>,
-    private tasksGateway: TasksGateway,
+    private notificationsService: NotificationsService,
   ) {}
 
   findAll(): Promise<Task[]> {
@@ -35,7 +35,9 @@ export class TasksService {
     });
 
     const savedTask = await this.taskRepository.save(task);
-    this.tasksGateway.notifyAllClients('taskCreated', savedTask);
+
+    this.notificationsService.notify('task.created', { task: savedTask });
+
     return savedTask;
   }
 
@@ -51,10 +53,18 @@ export class TasksService {
     }
 
     const updateTask = Object.assign(taskFound, updateTaskDto);
-    return await this.taskRepository.save(updateTask);
+    const savedTask = await this.taskRepository.save(updateTask);
+
+    this.notificationsService.notify('task.updated', { task: savedTask });
+
+    return savedTask;
   }
 
   async delete(id: number) {
-    return this.taskRepository.delete(id);
+    const result = await this.taskRepository.delete(id);
+
+    this.notificationsService.notify('task.deleted', { id });
+
+    return result;
   }
 }

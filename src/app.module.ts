@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { Role } from './roles/entities/role.entity';
@@ -8,6 +9,8 @@ import { Task } from './tasks/entities/task.entity';
 import { TasksModule } from './tasks/tasks.module';
 import { User } from './users/entities/user.entity';
 import { UsersModule } from './users/users.module';
+import { NotificationsService } from './notifications/notifications.service';
+import { NotificationsController } from './notifications/notifications.controller';
 
 @Module({
   imports: [
@@ -22,12 +25,15 @@ import { UsersModule } from './users/users.module';
       entities: [User, Task, Role],
       synchronize: true,
     }),
+    EventEmitterModule.forRoot({
+      global: true,
+    }),
     UsersModule,
     TasksModule,
     AuthModule,
     RolesModule,
   ],
-  controllers: [],
-  providers: [],
+  controllers: [NotificationsController],
+  providers: [NotificationsService],
 })
 export class AppModule {}

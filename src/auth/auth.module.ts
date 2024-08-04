@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { RolesModule } from 'src/roles/roles.module';
+import { GithubStrategy } from './strategies/github.strategy';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { RolesModule } from 'src/roles/roles.module';
       }),
     }),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, GithubStrategy],
   controllers: [AuthController],
   exports: [JwtModule],
 })

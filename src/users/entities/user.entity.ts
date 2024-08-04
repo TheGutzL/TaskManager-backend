@@ -16,6 +16,9 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: true })
+  githubId: string;
+
   @Column({ unique: true })
   username: string;
 
