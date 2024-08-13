@@ -41,7 +41,7 @@ export class AuthService {
     return { access_token: this.jwtService.sign(payload) };
   }
 
-  async register(createUserDto: CreateUserDto) {
+  async signup(createUserDto: CreateUserDto) {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const user = { ...createUserDto, password: hashedPassword };
     const userCreated = await this.usersService.create(user);
